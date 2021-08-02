@@ -9,15 +9,14 @@ class TransactionFilterTest(unittest.TestCase):
         test_data = {
             'Completed Date': ['19.02.2007', '12.12.2020', '14.06.2018', '14.11.2014'],
             'Reference': ['t1', 't2', 't3', 't4'],
-            'Category': ['Ogólne', 'Spożywcze', 'Przelewy', 'Transport']
+            'Category': ['Ogólne', 'Gotówka', 'Przelewy', 'Transport']
         }
         self.df = pd.DataFrame(test_data)
-        print(self.df)
 
     def test_remove_exchanges(self):
         # given
         self.df['Exchange Rate'] = pd.Series([None,
-                                              None,
+                                              ' ',
                                               'Kurs wymiany 1 € = 4,6276 zł	',
                                               'Kurs wymiany 1 $ = 4,02 zł	'])
         expected_filtered_length = 2
@@ -26,24 +25,38 @@ class TransactionFilterTest(unittest.TestCase):
         filtered = TransactionFilter.remove_exchanges(self.df)
 
         # then
-        self.assertEquals(len(filtered), expected_filtered_length)
+        self.assertEqual(len(filtered), expected_filtered_length)
 
     def test_remove_incomes(self):
         # given
         self.df['Paid In (EUR)'] = pd.Series([None,
-                                              None,
-                                              'Kurs wymiany 1 € = 4,6276 zł	',
-                                              'Kurs wymiany 1 $ = 4,02 zł	'])
+                                              ' ',
+                                              '683.57',
+                                              '24,67'])
         expected_filtered_length = 2
 
         # when
-        filtered = TransactionFilter.remove_exchanges(self.df)
+        filtered = TransactionFilter.remove_incomes(self.df)
 
         # then
-        self.assertEquals(len(filtered), expected_filtered_length)
+        self.assertEqual(len(filtered), expected_filtered_length)
 
     def test_remove_cash(self):
-        pass
+        # given
+        expected_filtered_length = 3
+
+        # when
+        filtered = TransactionFilter.remove_cash(self.df)
+
+        # then
+        self.assertEqual(len(filtered), expected_filtered_length)
 
     def test_remove_transfers(self):
-        pass
+        # given
+        expected_filtered_length = 3
+
+        # when
+        filtered = TransactionFilter.remove_transfers(self.df)
+
+        # then
+        self.assertEqual(len(filtered), expected_filtered_length)
