@@ -45,6 +45,7 @@ def preprocess_transactions(transactions: pd.DataFrame) -> pd.DataFrame:
     filtered_transactions = filter_transactions(transactions)
     preprocessed_transactions = make_columns_numeric(filtered_transactions, ['Paid Out (EUR)'])
     preprocessed_transactions['datetime'] = pd.to_datetime(preprocessed_transactions['Completed Date'], format='%d.%m.%Y')
+    preprocessed_transactions.sort_values('datetime', ascending=True, inplace=True)
     return preprocessed_transactions
 
 
