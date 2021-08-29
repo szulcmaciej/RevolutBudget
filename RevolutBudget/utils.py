@@ -1,8 +1,8 @@
+import base64
+import io
 from typing import List
 
-import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 
 source_files = ['/Users/maciek/Downloads/Revolut-EUR-Maciek.csv',
                 '/Users/maciek/Downloads/Revolut-EUR-Ewa.csv']
@@ -19,7 +19,25 @@ def read_revolut_data(source_files: List):
     return df
 
 
+def parse_uploaded_csv_to_dataframe(contents, filename) -> pd.DataFrame:
+    content_type, content_string = contents.split(',')
+
+    decoded = base64.b64decode(content_string)
+    if '.csv' in filename:
+        df = pd.read_csv(
+            io.StringIO(decoded.decode('utf-8')), sep=';')
+    else:
+        raise ValueError("File uploaded is not CSV")
+
+    return df
+
+
+def load_uploaded_transactions(list_of_contents, list_of_names):
+    transactions_split_by_file = \
+        [parse_uploaded_csv_to_dataframe(c, n) for c, n in zip(list_of_contents, list_of_names)]
+    all_transactions = pd.concat(transactions_split_by_file)
+    return all_transactions
+
+
 def comma_separated_string_to_numeric(value):
     return pd.to_numeric('.'.join(value.strip().split(',')))
-
-# def filter_revolut_data(''):

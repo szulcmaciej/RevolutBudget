@@ -1,14 +1,11 @@
-import base64
-import datetime
-import io
-
-import dash_table
 import pandas as pd
 
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
+
+from RevolutBudget.utils import load_uploaded_transactions
 
 
 class RevolutBudgetDashApp:
@@ -21,19 +18,6 @@ class RevolutBudgetDashApp:
 
     def run(self):
         self.dash_app.run_server()
-
-    @staticmethod
-    def parse_uploaded_csv_to_dataframe(contents, filename, date) -> pd.DataFrame:
-        content_type, content_string = contents.split(',')
-
-        decoded = base64.b64decode(content_string)
-        if '.csv' in filename:
-            df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')), sep=';')
-        else:
-            raise ValueError("File uploaded is not CSV")
-
-        return df
 
     def set_app_layout(self):
         self.dash_app.layout = html.Div([
@@ -66,17 +50,13 @@ class RevolutBudgetDashApp:
     def set_callbacks(self):
         @self.dash_app.callback(Output('output-data-upload', 'children'),
                                 Input('upload-data', 'contents'),
-                                State('upload-data', 'filename'),
-                                State('upload-data', 'last_modified'))
-        def update_output(list_of_contents, list_of_names, list_of_dates):
+                                State('upload-data', 'filename'))
+        def load_transactions_from_csv_files(list_of_contents, list_of_names):
             if list_of_contents is not None:
                 try:
-                    transactions_split_by_file = [
-                        self.parse_uploaded_csv_to_dataframe(c, n, d) for c, n, d in
-                        zip(list_of_contents, list_of_names, list_of_dates)]
-                    all_transactions = pd.concat(transactions_split_by_file)
-                    self.transactions = all_transactions
-                    message = f'Loaded {len(all_transactions)} transactions'
+                    self.transactions = load_uploaded_transactions(list_of_contents, list_of_names)
+                    message = f'Successfully loaded {len(self.transactions)} transactions' \
+                              f' from {len(list_of_contents)} files'
                 except Exception as e:
                     message = f'ERROR: {e}'
                 return html.P(message)
