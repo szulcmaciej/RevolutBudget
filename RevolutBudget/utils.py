@@ -44,7 +44,7 @@ def load_uploaded_transactions(list_of_contents, list_of_names):
 def preprocess_transactions(transactions: pd.DataFrame) -> pd.DataFrame:
     filtered_transactions = filter_transactions(transactions)
     preprocessed_transactions = make_columns_numeric(filtered_transactions, ['Paid Out (EUR)'])
-    preprocessed_transactions['Completed Date'] = pd.to_datetime(preprocessed_transactions['Completed Date'], format='%d.%m.%Y')
+    preprocessed_transactions['datetime'] = pd.to_datetime(preprocessed_transactions['Completed Date'], format='%d.%m.%Y')
     return preprocessed_transactions
 
 

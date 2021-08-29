@@ -7,9 +7,11 @@ def spending_by_category_plot(transactions: pd.DataFrame):
 
 
 def spending_by_category_in_months_plot(transactions: pd.DataFrame):
-    # TODO make the plot bigger (fullscreen?)
-    return px.bar(transactions,
-                  x=transactions['Completed Date'].dt.to_period('M').astype(str),
-                  y='Paid Out (EUR)',
-                  color='Category',
-                  title='Spending by category in months')
+    fig = px.bar(transactions,
+                 x=transactions['datetime'].dt.to_period('M').astype(str),
+                 y='Paid Out (EUR)',
+                 color='Category',
+                 custom_data=['Reference','Completed Date', 'Category']
+                )
+    fig.update_traces(hovertemplate='<b>%{customdata[0]}</b><br>Paid Out (EUR): %{y}<br>Date: %{customdata[1]}')
+    return fig
