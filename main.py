@@ -3,6 +3,6 @@ import os
 from RevolutBudget.dash_app.app import RevolutBudgetDashApp
 
 if __name__ == '__main__':
-    print(os.getenv('PORT'))
-    app = RevolutBudgetDashApp()
-    app.run()
+    revolut_budget_app = RevolutBudgetDashApp()
+    server = revolut_budget_app.dash_app.server
+    revolut_budget_app.run()
