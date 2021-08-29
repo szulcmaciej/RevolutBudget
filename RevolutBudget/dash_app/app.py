@@ -19,7 +19,7 @@ class RevolutBudgetDashApp:
         self.set_callbacks()
 
     def run(self):
-        self.dash_app.run_server(debug=True)
+        self.dash_app.run_server(debug=True, port=80)
 
     def set_app_layout(self):
         self.dash_app.layout = html.Div([
