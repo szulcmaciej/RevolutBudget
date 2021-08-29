@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 
-from RevolutBudget.transaction_filter import TransactionFilter
+from RevolutBudget.transaction_filters import *
 
 
 class TransactionFilterTest(unittest.TestCase):
@@ -19,10 +19,11 @@ class TransactionFilterTest(unittest.TestCase):
                                               ' ',
                                               'Kurs wymiany 1 € = 4,6276 zł	',
                                               'Kurs wymiany 1 $ = 4,02 zł	'])
+        df_filter = NoExchangeFilter()
         expected_filtered_length = 2
 
         # when
-        filtered = TransactionFilter.remove_exchanges(self.df)
+        filtered = df_filter.apply(self.df)
 
         # then
         self.assertEqual(len(filtered), expected_filtered_length)
@@ -33,30 +34,33 @@ class TransactionFilterTest(unittest.TestCase):
                                               ' ',
                                               '683.57',
                                               '24,67'])
+        df_filter = NoIncomeFilter()
         expected_filtered_length = 2
 
         # when
-        filtered = TransactionFilter.remove_incomes(self.df)
+        filtered = df_filter.apply(self.df)
 
         # then
         self.assertEqual(len(filtered), expected_filtered_length)
 
     def test_remove_cash(self):
         # given
+        df_filter = NoCashFilter()
         expected_filtered_length = 3
 
         # when
-        filtered = TransactionFilter.remove_cash(self.df)
+        filtered = df_filter.apply(self.df)
 
         # then
         self.assertEqual(len(filtered), expected_filtered_length)
 
     def test_remove_transfers(self):
         # given
+        df_filter = NoTransfersFilter()
         expected_filtered_length = 3
 
         # when
-        filtered = TransactionFilter.remove_transfers(self.df)
+        filtered = df_filter.apply(self.df)
 
         # then
         self.assertEqual(len(filtered), expected_filtered_length)
