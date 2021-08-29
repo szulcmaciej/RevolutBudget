@@ -4,6 +4,8 @@ from typing import List
 
 import pandas as pd
 
+from RevolutBudget.transaction_filters import NoTransfersFilter, NoExchangeFilter, NoCashFilter, NoIncomeFilter
+
 source_files = ['/Users/maciek/Downloads/Revolut-EUR-Maciek.csv',
                 '/Users/maciek/Downloads/Revolut-EUR-Ewa.csv']
 
@@ -39,5 +41,31 @@ def load_uploaded_transactions(list_of_contents, list_of_names):
     return all_transactions
 
 
+def preprocess_transactions(transactions: pd.DataFrame) -> pd.DataFrame:
+    filtered_transactions = filter_transactions(transactions)
+    preprocessed_transactions = make_columns_numeric(filtered_transactions, ['Paid Out (EUR)'])
+    preprocessed_transactions['Completed Date'] = pd.to_datetime(preprocessed_transactions['Completed Date'], format='%d.%m.%Y')
+    return preprocessed_transactions
+
+
+def filter_transactions(transactions: pd.DataFrame) -> pd.DataFrame:
+    filters = [
+        NoTransfersFilter(),
+        NoExchangeFilter(),
+        NoCashFilter(),
+        NoIncomeFilter()
+    ]
+    filtered_transactions = transactions.copy()
+    for f in filters:
+        filtered_transactions = f.apply(filtered_transactions)
+    return filtered_transactions
+
+
 def comma_separated_string_to_numeric(value):
     return pd.to_numeric('.'.join(value.strip().split(',')))
+
+
+def make_columns_numeric(df, columns):
+    for column in columns:
+        df[column] = df[column].apply(comma_separated_string_to_numeric)
+    return df

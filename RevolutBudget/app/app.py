@@ -6,8 +6,8 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 
-from RevolutBudget.plots import spending_by_category_plot
-from RevolutBudget.utils import load_uploaded_transactions
+from RevolutBudget.plots import spending_by_category_plot, spending_by_category_in_months_plot
+from RevolutBudget.utils import load_uploaded_transactions, preprocess_transactions
 
 
 class RevolutBudgetDashApp:
@@ -43,22 +43,15 @@ class RevolutBudgetDashApp:
                 multiple=True
             ),
             html.Div(id='output-data-upload'),
-            html.Div(id='plots',
-                     style={
-                         'width': '100%',
-                         'height': '60px',
-                         'lineHeight': '60px',
-                         'borderWidth': '1px',
-                         'borderStyle': 'dashed',
-                         'borderRadius': '5px',
-                         'textAlign': 'center',
-                         'margin': '10px',
-                         'backgroundColor': 'blue'
-                     })
+            html.Div(id='plots')
         ])
 
     def plots_objects(self):
-        return [dcc.Graph(id='spending_by_category_plot', figure=spending_by_category_plot(self.transactions))]
+        preprocessed_transactions = preprocess_transactions(self.transactions)
+        return [
+            dcc.Graph(id='spending_by_category_plot', figure=spending_by_category_plot(preprocessed_transactions)),
+            dcc.Graph(id='spending_by_category_in_months_plot', figure=spending_by_category_in_months_plot(preprocessed_transactions))
+        ]
 
     def set_callbacks(self):
         @self.dash_app.callback(Output('output-data-upload', 'children'),
