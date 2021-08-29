@@ -4,3 +4,4 @@ numpy
 notebook
 seaborn
 plotly
+dash
