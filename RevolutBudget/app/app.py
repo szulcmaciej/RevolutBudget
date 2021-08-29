@@ -1,10 +1,12 @@
 import pandas as pd
 
 import dash
+from dash import no_update
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 
+from RevolutBudget.plots import spending_by_category_plot
 from RevolutBudget.utils import load_uploaded_transactions
 
 
@@ -12,12 +14,12 @@ class RevolutBudgetDashApp:
     def __init__(self):
         self.external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
         self.dash_app = dash.Dash(__name__, external_stylesheets=self.external_stylesheets)
+        self.transactions = pd.DataFrame()
         self.set_app_layout()
         self.set_callbacks()
-        self.transactions = pd.DataFrame()
 
     def run(self):
-        self.dash_app.run_server()
+        self.dash_app.run_server(debug=True)
 
     def set_app_layout(self):
         self.dash_app.layout = html.Div([
@@ -42,13 +44,25 @@ class RevolutBudgetDashApp:
             ),
             html.Div(id='output-data-upload'),
             html.Div(id='plots',
-                     children=[
-
-                     ])
+                     style={
+                         'width': '100%',
+                         'height': '60px',
+                         'lineHeight': '60px',
+                         'borderWidth': '1px',
+                         'borderStyle': 'dashed',
+                         'borderRadius': '5px',
+                         'textAlign': 'center',
+                         'margin': '10px',
+                         'backgroundColor': 'blue'
+                     })
         ])
+
+    def plots_objects(self):
+        return [dcc.Graph(id='spending_by_category_plot', figure=spending_by_category_plot(self.transactions))]
 
     def set_callbacks(self):
         @self.dash_app.callback(Output('output-data-upload', 'children'),
+                                Output('plots', 'children'),
                                 Input('upload-data', 'contents'),
                                 State('upload-data', 'filename'))
         def load_transactions_from_csv_files(list_of_contents, list_of_names):
@@ -57,9 +71,12 @@ class RevolutBudgetDashApp:
                     self.transactions = load_uploaded_transactions(list_of_contents, list_of_names)
                     message = f'Successfully loaded {len(self.transactions)} transactions' \
                               f' from {len(list_of_contents)} files'
+                    self.set_app_layout()
                 except Exception as e:
                     message = f'ERROR: {e}'
-                return html.P(message)
+                return html.P(message), self.plots_objects()
+            else:
+                return no_update, no_update
 
 
 if __name__ == '__main__':
