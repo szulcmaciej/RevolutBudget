@@ -22,6 +22,6 @@ One day it might support Android, other currencies and languages, if I'm not laz
 ## Using the app
 1. Open https://revolut-budget.herokuapp.com/
 2. Upload the exported files
-<img src="help_img/select_files.PNG" alt="select files" width="200"/>
-4. 🎉🎉🎉
-5. <img src="help_img/loaded_data.PNG" alt="working app" width="200"/>
+<img src="help_img/select_files.png" alt="select files" width="300"/>
+3. 🎉🎉🎉
+<img src="help_img/loaded_data.png" alt="working app" width="300"/>
