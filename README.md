@@ -19,4 +19,6 @@ One day it might support Android, other currencies and languages, if I'm not laz
 6. <img src="help_img/save.PNG" alt="other options" width="200"/>
 7. <img src="help_img/save2.PNG" alt="other options" width="200"/>
 
-## TODO - using the app
+## Using the app
+1. Upload the exported files
+2. 🎉🎉🎉
